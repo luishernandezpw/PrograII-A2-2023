@@ -6,5 +6,6 @@
         <item>Multiplicacion</item>
         <item>Division</item>
         <item>Exponente</item>
+        <item>Factorial (!)</item>
     </string-array>
 </resources>

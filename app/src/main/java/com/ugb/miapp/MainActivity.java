@@ -27,10 +27,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 temp = (TextView) findViewById(R.id.txtNum1);
                 double num1 = Double.parseDouble(temp.getText().toString());
-
+                double num2 = 0;
                 temp = (TextView) findViewById(R.id.txtNum2);
-                double num2 = Double.parseDouble(temp.getText().toString());
-
+                try {
+                    num2 = Double.parseDouble(temp.getText().toString());
+                }catch (Exception e){
+                    //manejador de error
+                }
                 double resp = 0;
                 String msg = "Operacion invalida";
                 /*rgp = (RadioGroup)findViewById(R.id.rgpOpciones);
@@ -77,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
                     case 4://exponente
                         resp = Math.pow(num1,num2);
                         msg = "La exponenciacion es: "+ resp;
+                        break;
+                    case 5://factorial
+                        resp = 1;
+                        for(int i=2; i<=num1; i++){
+                            resp *= i;//resp = resp * i;
+                        }
+                        msg = "Factorial!: "+ resp;
                         break;
                 }
                 Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
