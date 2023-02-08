@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Conversores</string>
+    <string name="app_name">Sensores</string>
     <string-array name="monedas">
         <item>Dolar</item>
         <item>Quetzal</item>
