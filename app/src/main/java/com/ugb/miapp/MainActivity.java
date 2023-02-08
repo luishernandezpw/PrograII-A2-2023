@@ -1,12 +1,18 @@
 package com.ugb.miapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,57 +22,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    SensorManager sensorManager;
-    Sensor sensor;
-    SensorEventListener sensorEventListener;
     TextView temp;
+    LocationManager locationManager;
+    LocationListener locationListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        temp = findViewById(R.id.lblSensorLuz);
-        activarSensorLuz();
+        temp = findViewById(R.id.lblSensorGps);
+        obtenerPosicion();
     }
-    @Override
-    protected void onPause() {
-        detener();
-        super.onPause();
-    }
-    @Override
-    protected void onResume() {
-        iniciar();
-        super.onResume();
-    }
-    private void activarSensorLuz(){
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        if(sensor==null){
-            temp.setText("Tu telefono NO soporta el sensor de LUZ");
-            finish();
+    private void obtenerPosicion(){
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED
+        ){
+            temp.setText("NO tienes permiso de acceder al GPS");
+            return;
         }
-        sensorEventListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
-                temp.setText("Proximidad: Valor = "+ sensorEvent.values[0]);
-                if( sensorEvent.values[0]<=20 ){
-                    getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-                } else if (sensorEvent.values[0]>20 && sensorEvent.values[0]<=50) {
-                    getWindow().getDecorView().setBackgroundColor(Color.RED);
-                } else{
-                    getWindow().getDecorView().setBackgroundColor(Color.YELLOW);
-                }
-            }
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-
-            }
-        };
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        mostrarPosicion(location);
     }
-    private void iniciar(){
-        sensorManager.registerListener(sensorEventListener, sensor, 2000*1000);
-    }
-    private void detener(){
-        sensorManager.unregisterListener(sensorEventListener);
+    private void mostrarPosicion(Location location){
+        temp.setText("Posicion Actual: Latitud="+ location.getLatitude()+"; Longitud="+ location.getLongitude()+"; Altitud="+location.getAltitude());
     }
 }
