@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        temp = findViewById(R.id.lblSensorProximidad);
-        activarSensorProximidad();
+        temp = findViewById(R.id.lblSensorLuz);
+        activarSensorLuz();
     }
     @Override
     protected void onPause() {
@@ -38,20 +38,20 @@ public class MainActivity extends AppCompatActivity {
         iniciar();
         super.onResume();
     }
-    private void activarSensorProximidad(){
+    private void activarSensorLuz(){
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         if(sensor==null){
-            temp.setText("Tu telefono NO soporta el sensor de proximidad");
+            temp.setText("Tu telefono NO soporta el sensor de LUZ");
             finish();
         }
         sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
                 temp.setText("Proximidad: Valor = "+ sensorEvent.values[0]);
-                if( sensorEvent.values[0]<=4 ){
+                if( sensorEvent.values[0]<=20 ){
                     getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-                } else if (sensorEvent.values[0]>4 && sensorEvent.values[0]<=8) {
+                } else if (sensorEvent.values[0]>20 && sensorEvent.values[0]<=50) {
                     getWindow().getDecorView().setBackgroundColor(Color.RED);
                 } else{
                     getWindow().getDecorView().setBackgroundColor(Color.YELLOW);
