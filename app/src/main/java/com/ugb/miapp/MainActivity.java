@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        temp = findViewById(R.id.lblSensorProximidad);
-        activarSensorProximidad();
+        temp = findViewById(R.id.lblSensorAcelerometro);
+        activarSensorAcelerometro();
     }
     @Override
     protected void onPause() {
@@ -38,24 +38,17 @@ public class MainActivity extends AppCompatActivity {
         iniciar();
         super.onResume();
     }
-    private void activarSensorProximidad(){
+    private void activarSensorAcelerometro(){
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if(sensor==null){
-            temp.setText("Tu telefono NO soporta el sensor de proximidad");
+            temp.setText("Tu telefono NO soporta el sensor de acelerometro");
             finish();
         }
         sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
-                temp.setText("Proximidad: Valor = "+ sensorEvent.values[0]);
-                if( sensorEvent.values[0]<=4 ){
-                    getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-                } else if (sensorEvent.values[0]>4 && sensorEvent.values[0]<=8) {
-                    getWindow().getDecorView().setBackgroundColor(Color.RED);
-                } else{
-                    getWindow().getDecorView().setBackgroundColor(Color.YELLOW);
-                }
+                temp.setText("Acelerometro: X="+ sensorEvent.values[0] +"; Y="+ sensorEvent.values[1]+"; Z="+ sensorEvent.values[2]);
             }
             @Override
             public void onAccuracyChanged(Sensor sensor, int i) {
