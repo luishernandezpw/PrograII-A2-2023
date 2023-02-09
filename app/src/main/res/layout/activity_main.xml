@@ -42,7 +42,7 @@
         android:entries="@array/monedas" />
 
     <Spinner
-        android:id="@+id/spinner2"
+        android:id="@+id/spna"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="60dp"
@@ -56,4 +56,13 @@
         android:layout_below="@id/txtcantidad"
         android:layout_marginTop="40dp"
         android:text="Convertir" />
+
+    <TextView
+        android:id="@+id/lblrespuesta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnConvertir"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="40dp"
+        android:text="Respuesta: ?" />
 </RelativeLayout>

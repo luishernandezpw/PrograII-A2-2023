@@ -8,5 +8,8 @@
         <item>Peso CR</item>
         <item>Colon SV</item>
         <item>Euro</item>
+        <item>Yenes</item>
+        <item>Rupias</item>
+        <item>Libras</item>
     </string-array>
 </resources>
