@@ -1,5 +1,23 @@
 <resources>
     <string name="app_name">Conversores</string>
+    <string-array name="longitud">
+        <item>Metro</item>
+        <item>Centimetros</item>
+        <item>Pies</item>
+        <item>Pulgadas</item>
+        <item>Varas</item>
+        <item>Yardas</item>
+        <item>Kilometros</item>
+        <item>Millas</item>
+    </string-array>
+    <string-array name="almacenaminto">
+        <item>Megabyte</item>
+        <item>Bit</item>
+        <item>Byte</item>
+        <item>Kilobyte</item>
+        <item>Gigabyte</item>
+        <item>Terrabyte</item>
+    </string-array>
     <string-array name="monedas">
         <item>Dolar</item>
         <item>Quetzal</item>
