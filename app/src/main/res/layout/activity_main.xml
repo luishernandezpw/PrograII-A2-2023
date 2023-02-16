@@ -65,13 +65,45 @@
                         android:entries="@array/longitud" />
                 </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/tbhAlmcenamiento"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                </LinearLayout>
+                    <TextView
+                        android:id="@+id/lblDeAlmacenamiento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="40dp"
+                        android:text="DE:" />
+
+                    <TextView
+                        android:id="@+id/lblAlmacenamiento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="100dp"
+                        android:text="A:" />
+
+                    <Spinner
+                        android:id="@+id/spnDeAlmacenamiento"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="60dp"
+                        android:layout_marginTop="40dp"
+                        android:entries="@array/almacenamiento" />
+
+                    <Spinner
+                        android:id="@+id/spnAlmacenamiento"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="60dp"
+                        android:layout_marginTop="100dp"
+                        android:entries="@array/almacenamiento" />
+
+                </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/tbhMonedas"
@@ -110,6 +142,45 @@
                         android:layout_marginLeft="60dp"
                         android:layout_marginTop="100dp"
                         android:entries="@array/monedas" />
+
+                </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/tbhMasa"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/lblDeMasa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="40dp"
+                        android:text="DE:" />
+
+                    <TextView
+                        android:id="@+id/lblAMasa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="100dp"
+                        android:text="A:" />
+
+                    <Spinner
+                        android:id="@+id/spnDeMasa"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="60dp"
+                        android:layout_marginTop="40dp"
+                        android:entries="@array/masa" />
+
+                    <Spinner
+                        android:id="@+id/spnAMasa"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="60dp"
+                        android:layout_marginTop="100dp"
+                        android:entries="@array/masa" />
 
                 </RelativeLayout>
             </FrameLayout>

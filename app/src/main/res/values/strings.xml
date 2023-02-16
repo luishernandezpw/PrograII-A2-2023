@@ -10,7 +10,7 @@
         <item>Kilometros</item>
         <item>Millas</item>
     </string-array>
-    <string-array name="almacenaminto">
+    <string-array name="almacenamiento">
         <item>Megabyte</item>
         <item>Bit</item>
         <item>Byte</item>
@@ -29,5 +29,13 @@
         <item>Yenes</item>
         <item>Rupias</item>
         <item>Libras</item>
+    </string-array>
+    <string-array name="masa">
+        <item>Libra</item>
+        <item>Miligramos</item>
+        <item>Gramos</item>
+        <item>Onzas</item>
+        <item>Kilogramos</item>
+        <item>Toneladas</item>
     </string-array>
 </resources>
