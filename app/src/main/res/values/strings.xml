@@ -1,41 +1,13 @@
 <resources>
     <string name="app_name">Conversores</string>
-    <string-array name="longitud">
-        <item>Metro</item>
-        <item>Centimetros</item>
-        <item>Pies</item>
-        <item>Pulgadas</item>
-        <item>Varas</item>
-        <item>Yardas</item>
-        <item>Kilometros</item>
-        <item>Millas</item>
-    </string-array>
-    <string-array name="almacenamiento">
-        <item>Megabyte</item>
-        <item>Bit</item>
-        <item>Byte</item>
-        <item>Kilobyte</item>
-        <item>Gigabyte</item>
-        <item>Terrabyte</item>
-    </string-array>
-    <string-array name="monedas">
-        <item>Dolar</item>
-        <item>Quetzal</item>
-        <item>Lempira</item>
-        <item>Cordoba</item>
-        <item>Peso CR</item>
-        <item>Colon SV</item>
-        <item>Euro</item>
-        <item>Yenes</item>
-        <item>Rupias</item>
-        <item>Libras</item>
-    </string-array>
-    <string-array name="masa">
-        <item>Libra</item>
-        <item>Miligramos</item>
-        <item>Gramos</item>
-        <item>Onzas</item>
-        <item>Kilogramos</item>
-        <item>Toneladas</item>
+    <string-array name="area">
+        <item>Metro Cuadrados</item>
+        <item>Pie Cuadrados</item>
+        <item>Vara Cuadrados</item>
+        <item>Yarda Cuadrados</item>
+        <item>Tarea</item>
+        <item>Manzana</item>
+        <item>Hectarea</item>
+        <item>Acre</item>
     </string-array>
 </resources>
