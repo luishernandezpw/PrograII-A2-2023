@@ -1,11 +1,3 @@
 <resources>
-    <string name="app_name">Calculadora Basica</string>
-    <string-array name="opciones_calculadora_basica">
-        <item>Suma</item>
-        <item>Resta</item>
-        <item>Multiplicacion</item>
-        <item>Division</item>
-        <item>Exponente</item>
-        <item>Factorial (!)</item>
-    </string-array>
+    <string name="app_name">Agenda Amigos</string>
 </resources>
