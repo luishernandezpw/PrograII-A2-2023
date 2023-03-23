@@ -120,6 +120,7 @@ public class lista_amigos extends AppCompatActivity {
     }
     public void obtenerDatosAmigos(){
         try {
+            alAmigos.clear();
             db_agenda = new BD(lista_amigos.this, "", null, 1);
             cAMigos = db_agenda.consultar_agenda();
             if(cAMigos.moveToFirst()){
