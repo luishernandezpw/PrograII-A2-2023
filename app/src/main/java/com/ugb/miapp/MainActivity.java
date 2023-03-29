@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                 regresarListaAmigos();
             }
         });
-        mostrar_datos_amigos();
         img = findViewById(R.id.imgAmigo);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,25 +63,34 @@ public class MainActivity extends AppCompatActivity {
                 tomarFotoAmigo();
             }
         });
+        mostrar_datos_amigos();
     }
     void mostrar_datos_amigos(){
-        Bundle parametros = getIntent().getExtras();
-        accion = parametros.getString("accion");
-        if(accion.equals("modificar")){
-            String amigos[] = parametros.getStringArray("amigos");
-            id = amigos[0];
+        try {
+            Bundle parametros = getIntent().getExtras();
+            accion = parametros.getString("accion");
+            if (accion.equals("modificar")) {
+                String amigos[] = parametros.getStringArray("amigos");
+                id = amigos[0];
 
-            temp = findViewById(R.id.txtnombre);
-            temp.setText(amigos[1]);
+                temp = findViewById(R.id.txtnombre);
+                temp.setText(amigos[1]);
 
-            temp = findViewById(R.id.txtdireccion);
-            temp.setText(amigos[2]);
+                temp = findViewById(R.id.txtdireccion);
+                temp.setText(amigos[2]);
 
-            temp = findViewById(R.id.txtTelefono);
-            temp.setText(amigos[3]);
+                temp = findViewById(R.id.txtTelefono);
+                temp.setText(amigos[3]);
 
-            temp = findViewById(R.id.txtemail);
-            temp.setText(amigos[4]);
+                temp = findViewById(R.id.txtemail);
+                temp.setText(amigos[4]);
+
+                urlCompletaImg = amigos[5];
+                Bitmap bitmap = BitmapFactory.decodeFile(urlCompletaImg);
+                img.setImageBitmap(bitmap);
+            }
+        }catch (Exception ex){
+            Toast.makeText(this, "Error al mostrar los datos: "+ ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
     void guardar_agenda(){
@@ -100,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             String email = temp.getText().toString();
 
             db_agenda = new BD(MainActivity.this, "",null,1);
-            String result = db_agenda.administrar_agenda(id, nombre, direccion, telefono, email, accion);
+            String result = db_agenda.administrar_agenda(id, nombre, direccion, telefono, email, urlCompletaImg, accion);
             String msg = result;
             if( result.equals("ok") ){
                 msg = "Registro guardado con exito";
@@ -130,6 +138,8 @@ public class MainActivity extends AppCompatActivity {
             }catch (Exception ex){
                 Toast.makeText(this, "Error al tomar la foto: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
             }
+        }else{
+            Toast.makeText(this, "NO se selecciono una foto... ", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -137,9 +147,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try{
-            if( resultCode==1 && resultCode==RESULT_OK ){
+            if( requestCode==1 && resultCode==RESULT_OK ){
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaImg);
                 img.setImageBitmap(imagenBitmap);
+            }else{
+                Toast.makeText(this, "Se cancelo la seleccion de la foto", Toast.LENGTH_LONG).show();
             }
         }catch (Exception ex){
             Toast.makeText(this, "Error al mostrar la camara: "+ ex.getMessage(), Toast.LENGTH_SHORT).show();

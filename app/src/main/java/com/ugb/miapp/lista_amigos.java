@@ -79,6 +79,7 @@ public class lista_amigos extends AppCompatActivity {
                         cAMigos.getString(2), //direccion
                         cAMigos.getString(3), //telefono
                         cAMigos.getString(4), //email
+                        cAMigos.getString(5), //foto->url
                     };
                     parametros.putString("accion", "modificar");
                     parametros.putStringArray("amigos", amigos);
@@ -102,7 +103,7 @@ public class lista_amigos extends AppCompatActivity {
             confirmacion.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    db_agenda.administrar_agenda(cAMigos.getString(0), "", "", "", "","eliminar");
+                    db_agenda.administrar_agenda(cAMigos.getString(0), "", "", "", "", "","eliminar");
                     obtenerDatosAmigos();
                     dialogInterface.dismiss();
                 }
