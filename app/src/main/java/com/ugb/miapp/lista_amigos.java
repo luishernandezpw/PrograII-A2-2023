@@ -31,8 +31,9 @@ public class lista_amigos extends AppCompatActivity {
     ListView lts;
     Cursor cAMigos;
     FloatingActionButton btn;
-    final ArrayList<String> alAmigos = new ArrayList<String>();
-    final ArrayList<String> alAmigosCopy = new ArrayList<String>();
+    final ArrayList<amigos> alAmigos = new ArrayList<amigos>();
+    final ArrayList<amigos> alAmigosCopy = new ArrayList<amigos>();
+    amigos misAmigos;
     protected void onCreate(Bundle instance){
         super.onCreate(instance);
         setContentView(R.layout.lista_amigos);
@@ -122,17 +123,30 @@ public class lista_amigos extends AppCompatActivity {
     public void obtenerDatosAmigos(){
         try {
             alAmigos.clear();
+            alAmigosCopy.clear();
             db_agenda = new BD(lista_amigos.this, "", null, 1);
             cAMigos = db_agenda.consultar_agenda();
             if(cAMigos.moveToFirst()){
                 lts = findViewById(R.id.ltsAmigos);
-                final ArrayAdapter<String> adAmigos = new ArrayAdapter<String>(lista_amigos.this,
+                /*final ArrayAdapter<String> adAmigos = new ArrayAdapter<String>(lista_amigos.this,
                         android.R.layout.simple_expandable_list_item_1, alAmigos);
-                lts.setAdapter(adAmigos);
+                lts.setAdapter(adAmigos);*/
                 do{
-                    alAmigos.add(cAMigos.getString(1));//1 es el nombre del amigo, pues 0 es el idAmigo.
+                    //alAmigos.add(cAMigos.getString(1));//1 es el nombre del amigo, pues 0 es el idAmigo.
+                    misAmigos = new amigos(
+                      cAMigos.getString(0),//idAmigo
+                      cAMigos.getString(1),//nombre
+                      cAMigos.getString(2),//direccion
+                      cAMigos.getString(3),//telefono
+                      cAMigos.getString(4),//email
+                      cAMigos.getString(5) //urlFotoAmigo
+                    );
+                    alAmigos.add(misAmigos);
                 }while(cAMigos.moveToNext());
-                adAmigos.notifyDataSetChanged();
+                adaptadorImagenes adImagenes = new adaptadorImagenes(getApplicationContext(), alAmigos);
+                lts.setAdapter(adImagenes);
+                alAmigosCopy.addAll(alAmigos);
+                //adAmigos.notifyDataSetChanged();
                 registerForContextMenu(lts);
             }else{
                 Toast.makeText(this, "NO HAY datos que mostrar", Toast.LENGTH_SHORT).show();
@@ -157,8 +171,8 @@ public class lista_amigos extends AppCompatActivity {
                         // la lista completa de amigos
                         alAmigos.addAll(alAmigosCopy);
                     }else{ //si esta buscando amigos...
-                        /*for(amigos amigo : alAmigosCopy){
-                            String idAmigo = amigo.getidAmigo();
+                        for(amigos amigo : alAmigosCopy){
+                            String idAmigo = amigo.getIdAmigo();
                             String nombre = amigo.getNombre();
                             String direccion = amigo.getDireccion();
                             String telefono = amigo.getTelefono();
@@ -170,7 +184,9 @@ public class lista_amigos extends AppCompatActivity {
                                 email.toLowerCase().trim().contains(valor)){
                                 alAmigos.add(amigo);
                             }
-                        }*/
+                        }
+                        adaptadorImagenes adImagenes = new adaptadorImagenes(getApplicationContext(), alAmigos);
+                        lts.setAdapter(adImagenes);
                     }
                 }catch (Exception e){
                     Toast.makeText(lista_amigos.this, "Error al buscar amigos: "+ e.getMessage(), Toast.LENGTH_SHORT).show();
