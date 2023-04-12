@@ -1,5 +1,6 @@
 package com.ugb.miapp;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +24,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class lista_amigos extends AppCompatActivity {
@@ -34,6 +38,10 @@ public class lista_amigos extends AppCompatActivity {
     final ArrayList<amigos> alAmigos = new ArrayList<amigos>();
     final ArrayList<amigos> alAmigosCopy = new ArrayList<amigos>();
     amigos misAmigos;
+    JSONArray datosJSON; //para los datos que vienen del servidor
+    JSONObject jsonObject;
+    ProgressDialog progreso; //para la barra de progreso...
+    obtenerDatosServidor datosServidor;
     protected void onCreate(Bundle instance){
         super.onCreate(instance);
         setContentView(R.layout.lista_amigos);
@@ -122,6 +130,7 @@ public class lista_amigos extends AppCompatActivity {
     }
     public void obtenerDatosAmigos(){
         try {
+            obtenerDatosAmigosServer();
             alAmigos.clear();
             alAmigosCopy.clear();
             db_agenda = new BD(lista_amigos.this, "", null, 1);
@@ -153,6 +162,16 @@ public class lista_amigos extends AppCompatActivity {
             }
         }catch (Exception e){
             Toast.makeText(this, "Error al obtener amigos: "+ e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    void obtenerDatosAmigosServer(){
+        try {
+            datosServidor = new obtenerDatosServidor();
+            String data = datosServidor.execute().get();
+
+            Toast.makeText(this, "DATA: "+ data, Toast.LENGTH_LONG).show();
+        }catch (Exception ex){
+            Toast.makeText(this, "Error al obtener datos desde el servidor: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
     void buscarAmigos(){
