@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.File;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     BD db_agenda;
     String accion="nuevo";
     String id="";
+    String rev="";
     Button btn;
     TextView temp;
     FloatingActionButton fab;
@@ -72,20 +74,21 @@ public class MainActivity extends AppCompatActivity {
             if (accion.equals("modificar")) {
                 String amigos[] = parametros.getStringArray("amigos");
                 id = amigos[0];
+                rev = amigos[1];
 
                 temp = findViewById(R.id.txtnombre);
-                temp.setText(amigos[1]);
-
-                temp = findViewById(R.id.txtdireccion);
                 temp.setText(amigos[2]);
 
-                temp = findViewById(R.id.txtTelefono);
+                temp = findViewById(R.id.txtdireccion);
                 temp.setText(amigos[3]);
 
-                temp = findViewById(R.id.txtemail);
+                temp = findViewById(R.id.txtTelefono);
                 temp.setText(amigos[4]);
 
-                urlCompletaImg = amigos[5];
+                temp = findViewById(R.id.txtemail);
+                temp.setText(amigos[5]);
+
+                urlCompletaImg = amigos[6];
                 Bitmap bitmap = BitmapFactory.decodeFile(urlCompletaImg);
                 img.setImageBitmap(bitmap);
             }
@@ -107,9 +110,24 @@ public class MainActivity extends AppCompatActivity {
             temp = (TextView) findViewById(R.id.txtemail);
             String email = temp.getText().toString();
 
+            //guardar datos en servidor
+            JSONObject datosAmigos = new JSONObject();
+            if( accion.equals("modificar") ){
+                datosAmigos.put("_id", id);
+                datosAmigos.put("_rev", rev);
+            }
+            datosAmigos.put("nombre", nombre);
+            datosAmigos.put("direccion", direccion);
+            datosAmigos.put("telefono", telefono);
+            datosAmigos.put("email", email);
+            datosAmigos.put("urlFoto", urlCompletaImg);
+
+            enviarDatosServidor objGuardarDatosServidor= new enviarDatosServidor(getApplicationContext());
+            String msg = objGuardarDatosServidor.execute(datosAmigos.toString()).get();
+
             db_agenda = new BD(MainActivity.this, "",null,1);
             String result = db_agenda.administrar_agenda(id, nombre, direccion, telefono, email, urlCompletaImg, accion);
-            String msg = result;
+            msg = result;
             if( result.equals("ok") ){
                 msg = "Registro guardado con exito";
                 regresarListaAmigos();

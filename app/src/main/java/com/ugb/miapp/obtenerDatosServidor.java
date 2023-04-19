@@ -21,7 +21,7 @@ public class obtenerDatosServidor extends AsyncTask<String, String, String> {
         StringBuilder result = new StringBuilder();
         try{
             //conexion con el servidor
-            URL url = new URL("http://192.168.100.6:5984/db_amigos/_design/amigos/_view/amigos");
+            URL url = new URL(utilidades.url_consulta);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("GET");
 
