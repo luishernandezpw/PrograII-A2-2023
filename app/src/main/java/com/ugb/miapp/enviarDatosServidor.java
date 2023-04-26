@@ -2,6 +2,7 @@ package com.ugb.miapp;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -64,7 +65,8 @@ public class enviarDatosServidor extends AsyncTask<String, String, String> {
             jsonResponse = stringBuffer.toString();
             return jsonResponse;
         }catch (Exception ex){
-            Toast.makeText(context, "Error al enviar Datos al servidor: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d("ENVIANDO", "Error al emviar datos al server: "+ ex.getLocalizedMessage());
+            //Toast.makeText(context, "Error al enviar Datos al servidor: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
         }
         return null;
     }

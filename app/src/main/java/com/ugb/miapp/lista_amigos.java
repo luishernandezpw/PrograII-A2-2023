@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,6 +43,7 @@ public class lista_amigos extends AppCompatActivity {
     JSONObject jsonObject;
     ProgressDialog progreso; //para la barra de progreso...
     obtenerDatosServidor datosServidor;
+    int posicion = 0;
     protected void onCreate(Bundle instance){
         super.onCreate(instance);
         setContentView(R.layout.lista_amigos);
@@ -68,9 +70,14 @@ public class lista_amigos extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.mimenu, menu);
 
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-        cAMigos.moveToPosition(info.position);
-        menu.setHeaderTitle(cAMigos.getString(1)); //1=> Nombre del amigo...
+        try{
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            //cAMigos.moveToPosition(info.position);
+            posicion = info.position;
+            menu.setHeaderTitle(datosJSON.getJSONObject(posicion).getJSONObject("value").getString("nombre")); //1=> Nombre del amigo...
+        }catch (Exception ex){
+            Toast.makeText(getApplicationContext(), "Error al mostrar el menu: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -82,7 +89,7 @@ public class lista_amigos extends AppCompatActivity {
                     abrirAgregarAmigos(parametros);
                     return true;
                 case R.id.mnxModificar:
-                    String amigos[] = {
+                    /*String amigos[] = {
                         cAMigos.getString(0), //idAmigo
                         cAMigos.getString(0), //rev
                         cAMigos.getString(1), //nombre
@@ -90,9 +97,11 @@ public class lista_amigos extends AppCompatActivity {
                         cAMigos.getString(3), //telefono
                         cAMigos.getString(4), //email
                         cAMigos.getString(5), //foto->url
-                    };
+                    };*/
+                    //Log.d("MODIFICANDO: ", "DATA: "+ datosJSON.getJSONObject(posicion).toString());
                     parametros.putString("accion", "modificar");
-                    parametros.putStringArray("amigos", amigos);
+                    parametros.putString("amigos", datosJSON.getJSONObject(posicion).toString());
+                    //parametros.putStringArray("amigos", amigos);
                     abrirAgregarAmigos(parametros);
                     return true;
                 case R.id.mnxEliminar:
@@ -113,7 +122,7 @@ public class lista_amigos extends AppCompatActivity {
             confirmacion.setPositiveButton("Si", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    db_agenda.administrar_agenda(cAMigos.getString(0), "", "", "", "", "","eliminar");
+                    db_agenda.administrar_agenda("", "", cAMigos.getString(2), "", "", "", "", "","eliminar");
                     obtenerDatosAmigos();
                     dialogInterface.dismiss();
                 }
@@ -131,14 +140,13 @@ public class lista_amigos extends AppCompatActivity {
     }
     public void obtenerDatosAmigos(){
         try {
-
             db_agenda = new BD(lista_amigos.this, "", null, 1);
             cAMigos = db_agenda.consultar_agenda();
-            if(cAMigos.moveToFirst()){
+            /*if(cAMigos.moveToFirst()){
                 /*final ArrayAdapter<String> adAmigos = new ArrayAdapter<String>(lista_amigos.this,
                         android.R.layout.simple_expandable_list_item_1, alAmigos);
                 lts.setAdapter(adAmigos);*/
-                datosJSON = new JSONArray();
+                /*datosJSON = new JSONArray();
                 do{
                     //alAmigos.add(cAMigos.getString(1));//1 es el nombre del amigo, pues 0 es el idAmigo.
                     jsonObject = new JSONObject();
@@ -156,10 +164,10 @@ public class lista_amigos extends AppCompatActivity {
                     datosJSON.put(jsonObjectValue);
                 }while(cAMigos.moveToNext());
                 mostrarDatosAmigos();
-            }else{
+            }else{*/
                 obtenerDatosAmigosServer();
-                Toast.makeText(this, "Sincronizando con servidor", Toast.LENGTH_SHORT).show();
-            }
+                //Toast.makeText(this, "Sincronizando con servidor", Toast.LENGTH_SHORT).show();
+            //}
         }catch (Exception e){
             Toast.makeText(this, "Error al obtener amigos: "+ e.getMessage(), Toast.LENGTH_LONG).show();
         }
@@ -168,6 +176,7 @@ public class lista_amigos extends AppCompatActivity {
         try {
             datosServidor = new obtenerDatosServidor();
             String data = datosServidor.execute().get();
+            Log.d("RECIBIENDO: ", "DATA: "+ data);
             jsonObject = new JSONObject(data);
             datosJSON = jsonObject.getJSONArray("rows");
             mostrarDatosAmigos();
@@ -185,9 +194,12 @@ public class lista_amigos extends AppCompatActivity {
                 JSONObject misDatosJSONObject;
                 for (int i=0; i<datosJSON.length(); i++){
                     misDatosJSONObject = datosJSON.getJSONObject(i).getJSONObject("value");
+                    Log.d("MOSTRANDO: ", "DATA: "+ misDatosJSONObject.toString());
+
                     misAmigos = new amigos(
-                            misDatosJSONObject.getString("_id"),
+                            "123",
                             misDatosJSONObject.getString("_rev"),
+                            misDatosJSONObject.getString("idUnico"),
                             misDatosJSONObject.getString("nombre"),
                             misDatosJSONObject.getString("direccion"),
                             misDatosJSONObject.getString("telefono"),
@@ -225,7 +237,6 @@ public class lista_amigos extends AppCompatActivity {
                         alAmigos.addAll(alAmigosCopy);
                     }else{ //si esta buscando amigos...
                         for(amigos amigo : alAmigosCopy){
-                            String idAmigo = amigo.getIdAmigo();
                             String nombre = amigo.getNombre();
                             String direccion = amigo.getDireccion();
                             String telefono = amigo.getTelefono();
