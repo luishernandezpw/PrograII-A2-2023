@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     String urlCompletaImg="";
     Intent tomarFotoIntent;
     utilidades utl;
+    detectarInternet di;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,17 +132,22 @@ public class MainActivity extends AppCompatActivity {
             datosAmigos.put("email", email);
             datosAmigos.put("urlFoto", urlCompletaImg);
 
-            enviarDatosServidor objGuardarDatosServidor= new enviarDatosServidor(getApplicationContext());
-            String msg = objGuardarDatosServidor.execute(datosAmigos.toString()).get();
-            JSONObject respJSON = new JSONObject(msg);
-            if( respJSON.getBoolean("ok") ){
-                id = respJSON.getString("id");
-                rev = respJSON.getString("rev");
-            } else {
-                msg = "No fue pisible guardar en el servidor el amigo: "+ msg;
+            String msg = "", actualizado = "no";
+            di = new detectarInternet(getApplicationContext());
+            if( di.hayConexionInternet() ) {
+                enviarDatosServidor objGuardarDatosServidor = new enviarDatosServidor(getApplicationContext());
+                msg = objGuardarDatosServidor.execute(datosAmigos.toString()).get();
+                JSONObject respJSON = new JSONObject(msg);
+                if (respJSON.getBoolean("ok")) {
+                    id = respJSON.getString("id");
+                    rev = respJSON.getString("rev");
+                    actualizado = "si";
+                } else {
+                    msg = "No fue pisible guardar en el servidor el amigo: " + msg;
+                }
             }
             db_agenda = new BD(MainActivity.this, "",null,1);
-            String result = db_agenda.administrar_agenda(id, rev, idUnico, nombre, direccion, telefono, email, urlCompletaImg, accion);
+            String result = db_agenda.administrar_agenda(id, rev, idUnico, nombre, direccion, telefono, email, urlCompletaImg, accion, actualizado);
             msg = result;
             if( result.equals("ok") ){
                 msg = "Registro guardado con exito";
