@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "840894601318",
+    "firebase_url": "https://practica-ugb-a2-2023-default-rtdb.firebaseio.com",
+    "project_id": "practica-ugb-a2-2023",
+    "storage_bucket": "practica-ugb-a2-2023.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:840894601318:android:df26f0165e38b1810235a7",
+        "android_client_info": {
+          "package_name": "com.ugb.miapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "840894601318-3i0db60f6i538r0vopl8k34rk763l7go.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq7r9er8vj8bLhoReWZx4wuGY40k944tM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "840894601318-3i0db60f6i538r0vopl8k34rk763l7go.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
