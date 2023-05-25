@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 import org.w3c.dom.Text;
@@ -27,6 +28,7 @@ import org.w3c.dom.Text;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
     BD db_agenda;
@@ -42,10 +44,20 @@ public class MainActivity extends AppCompatActivity {
     Intent tomarFotoIntent;
     utilidades utl;
     detectarInternet di;
+    MyFirebaseInstaceIdService myFirebaseInstaceIdService;
+    String miToken = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try {
+            myFirebaseInstaceIdService = new MyFirebaseInstaceIdService();
+            miToken = myFirebaseInstaceIdService.obtenerToken();
+            Toast.makeText(getApplicationContext(), "Mi Token: " + miToken, Toast.LENGTH_LONG).show();
+        }catch (Exception ex){
+            Toast.makeText(getApplicationContext(), "Error: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
 
         utl = new utilidades();
         btn = findViewById(R.id.btnGuardar);
