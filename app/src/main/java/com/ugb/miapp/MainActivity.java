@@ -1,9 +1,6 @@
 package com.ugb.miapp;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,213 +8,164 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.messaging.FirebaseMessaging;
+import androidx.core.content.FileProvider;
 
-import org.json.JSONObject;
-import org.w3c.dom.Text;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicReference;
 
-public class MainActivity extends AppCompatActivity {
-    BD db_agenda;
-    String accion="nuevo";
-    String id="";
-    String rev="";
-    String idUnico;
-    Button btn;
-    TextView temp;
-    FloatingActionButton fab;
-    ImageView img;
-    String urlCompletaImg="";
-    Intent tomarFotoIntent;
-    utilidades utl;
-    detectarInternet di;
-    MyFirebaseInstaceIdService myFirebaseInstaceIdService;
-    String miToken = "";
+public class MainActivity extends Activity {
+    ImageView imgPhoto;
+    Intent takePhotoIntent;
+    String urlCompleteImg;
+    String urlCompleteImgFirestore;
+    TextView tempVal;
+    Button btnGuardar;
+    DatabaseReference databaseReference;
+    String miToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         try {
-            myFirebaseInstaceIdService = new MyFirebaseInstaceIdService();
-            miToken = myFirebaseInstaceIdService.obtenerToken();
-            Toast.makeText(getApplicationContext(), "Mi Token: " + miToken, Toast.LENGTH_LONG).show();
+            obtenerToken();
+            tomarFoto();
+        }catch (Exception e){
+            mostrarMsgToast(e.getMessage());
+        }
+        btnGuardar = findViewById(R.id.btnGuardarUsuario);
+        btnGuardar.setOnClickListener(v -> {
+            uploadPhotoFirestore();
+        });
+    }
+    void uploadPhotoFirestore(){
+        mostrarMsgToast("Subiendo la foto te confirmaremos cuando este listo");
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        Uri file = Uri.fromFile(new File(urlCompleteImg));
+        final StorageReference reference = storageReference.child("photos/"+file.getLastPathSegment());
+
+        final UploadTask uploadTask = reference.putFile(file);
+        uploadTask.addOnFailureListener(e -> {
+            mostrarMsgToast("Fallo el subir la foto al servidor: "+ e.getMessage());
+        });
+        uploadTask.addOnSuccessListener(taskSnapshot -> {
+            mostrarMsgToast("Listo la foto se subio correctamente al servidor");
+            Task<Uri> downloadUri = uploadTask.continueWithTask(task -> reference.getDownloadUrl()).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    urlCompleteImgFirestore = task.getResult().toString();
+                    guardarUsuario();
+                } else{
+                    mostrarMsgToast("La foto se subio con exito pero no pude obtener su enlace");
+                }
+            });
+        });
+    }
+    private void guardarUsuario(){
+        try{
+            databaseReference = FirebaseDatabase.getInstance().getReference("usuarios");
+            tempVal = findViewById(R.id.txtNombreUsuario);
+            String nombre = tempVal.getText().toString(),
+                    key = databaseReference.push().getKey();
+            if( miToken=="" || miToken==null ){
+                obtenerToken();
+            }
+            if( miToken!=null && miToken!="" ){
+                usuarios user = new usuarios(nombre, "luishernandez@ugb.edu.sv", urlCompleteImg, urlCompleteImgFirestore, miToken);
+                if(key!=null){
+                    databaseReference.child(key).setValue(user).addOnSuccessListener(aVoid -> {
+                        mostrarMsgToast("Usuario registrado con exito");
+                        mostrarListaUsuarios();
+                    });
+                } else {
+                    mostrarMsgToast("NO se inserto el usuario en la base de datos de firebase");
+                }
+            } else{
+                mostrarMsgToast("NO pude obtener el identificar de tu telefono, por favor intentalo mas tarde.");
+            }
+        }catch (Exception ex){
+            mostrarMsgToast(ex.getMessage());
+        }
+    }
+    void tomarFoto() {
+        imgPhoto = findViewById(R.id.imgPhoto);
+        imgPhoto.setOnClickListener(v->{
+            takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
+                //guardando la imagen
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (Exception ex) {
+                }
+                if (photoFile != null) {
+                    try {
+                        Uri photoURI = FileProvider.getUriForFile(MainActivity.this, "com.ugb.miapp.fileprovider", photoFile);
+                        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(takePhotoIntent, 1);
+                    } catch (Exception ex) {
+                        Toast.makeText(getApplicationContext(), "Error Toma Foto: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (requestCode == 1 && resultCode == RESULT_OK) {
+                Bitmap imageBitmap = BitmapFactory.decodeFile(urlCompleteImg);
+                imgPhoto.setImageBitmap(imageBitmap);
+            }
         }catch (Exception ex){
             Toast.makeText(getApplicationContext(), "Error: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-        utl = new utilidades();
-        btn = findViewById(R.id.btnGuardar);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                guardar_agenda();
-            }
-        });
-        fab = findViewById(R.id.fabRegresarListaAmigos);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                regresarListaAmigos();
-            }
-        });
-        img = findViewById(R.id.imgAmigo);
-        img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tomarFotoAmigo();
-            }
-        });
-        mostrar_datos_amigos();
     }
-    void mostrar_datos_amigos(){
-        try {
-            Bundle parametros = getIntent().getExtras();
-            accion = parametros.getString("accion");
-            if (accion.equals("modificar")) {
-                //String amigos[] = parametros.getStringArray("amigos");
-                JSONObject jsonObject = new JSONObject(parametros.getString("amigos")).getJSONObject("value");
-
-                id = jsonObject.getString("_id");
-                rev = jsonObject.getString("_rev");
-                idUnico = jsonObject.getString(("idUnico"));
-
-                temp = findViewById(R.id.txtnombre);
-                temp.setText(jsonObject.getString("nombre"));
-
-                temp = findViewById(R.id.txtdireccion);
-                temp.setText(jsonObject.getString("direccion"));
-
-                temp = findViewById(R.id.txtTelefono);
-                temp.setText(jsonObject.getString("telefono"));
-
-                temp = findViewById(R.id.txtemail);
-                temp.setText(jsonObject.getString("email"));
-
-                urlCompletaImg = jsonObject.getString("urlFoto");
-                Bitmap bitmap = BitmapFactory.decodeFile(urlCompletaImg);
-                img.setImageBitmap(bitmap);
-            }else{
-                idUnico = utl.generarIdUnico();
-            }
-        }catch (Exception ex){
-            Toast.makeText(this, "Error al mostrar los datos: "+ ex.getMessage(), Toast.LENGTH_SHORT).show();
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "imagen_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if( storageDir.exists()==false ){
+            storageDir.mkdirs();
         }
-    }
-    void guardar_agenda(){
-        try {
-            temp = (TextView) findViewById(R.id.txtnombre);
-            String nombre = temp.getText().toString();
-
-            temp = (TextView) findViewById(R.id.txtdireccion);
-            String direccion = temp.getText().toString();
-
-            temp = (TextView) findViewById(R.id.txtTelefono);
-            String telefono = temp.getText().toString();
-
-            temp = (TextView) findViewById(R.id.txtemail);
-            String email = temp.getText().toString();
-
-            //guardar datos en servidor
-            JSONObject datosAmigos = new JSONObject();
-            if( accion.equals("modificar") && id.length()>0 && rev.length()>0 ){
-                datosAmigos.put("_id", id);
-                datosAmigos.put("_rev", rev);
-            }
-            datosAmigos.put("idUnico", idUnico);
-            datosAmigos.put("nombre", nombre);
-            datosAmigos.put("direccion", direccion);
-            datosAmigos.put("telefono", telefono);
-            datosAmigos.put("email", email);
-            datosAmigos.put("urlFoto", urlCompletaImg);
-
-            String msg = "", actualizado = "no";
-            di = new detectarInternet(getApplicationContext());
-            if( di.hayConexionInternet() ) {
-                enviarDatosServidor objGuardarDatosServidor = new enviarDatosServidor(getApplicationContext());
-                msg = objGuardarDatosServidor.execute(datosAmigos.toString()).get();
-                JSONObject respJSON = new JSONObject(msg);
-                if (respJSON.getBoolean("ok")) {
-                    id = respJSON.getString("id");
-                    rev = respJSON.getString("rev");
-                    actualizado = "si";
-                } else {
-                    msg = "No fue pisible guardar en el servidor el amigo: " + msg;
-                }
-            }
-            db_agenda = new BD(MainActivity.this, "",null,1);
-            String result = db_agenda.administrar_agenda(id, rev, idUnico, nombre, direccion, telefono, email, urlCompletaImg, accion, actualizado);
-            msg = result;
-            if( result.equals("ok") ){
-                msg = "Registro guardado con exito";
-                regresarListaAmigos();
-            }
-            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-        }catch (Exception e){
-            Toast.makeText(this, "Error en guardar agenda: "+ e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-    void regresarListaAmigos(){
-        Intent iListaAmigos = new Intent(MainActivity.this, lista_amigos.class);
-        startActivity(iListaAmigos);
-    }
-    private void tomarFotoAmigo(){
-        tomarFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if( tomarFotoIntent.resolveActivity(getPackageManager())!=null ){
-            File fotoAmigo = null;
-            try{
-                fotoAmigo = crearImagenAmigo();
-                if( fotoAmigo!=null ){
-                    Uri uriFotoAmigo = FileProvider.getUriForFile(MainActivity.this,
-                            "com.ugb.miapp.fileprovider", fotoAmigo);
-                    tomarFotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriFotoAmigo);
-                    startActivityForResult(tomarFotoIntent, 1);
-                }
-            }catch (Exception ex){
-                Toast.makeText(this, "Error al tomar la foto: "+ ex.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }else{
-            Toast.makeText(this, "NO se selecciono una foto... ", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try{
-            if( requestCode==1 && resultCode==RESULT_OK ){
-                Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaImg);
-                img.setImageBitmap(imagenBitmap);
-            }else{
-                Toast.makeText(this, "Se cancelo la seleccion de la foto", Toast.LENGTH_LONG).show();
-            }
-        }catch (Exception ex){
-            Toast.makeText(this, "Error al mostrar la camara: "+ ex.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private File crearImagenAmigo() throws Exception{
-        String fechaHoraMs = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fileName = "imagen_"+ fechaHoraMs +"_";
-        File dirAlmacenamiento = getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        if(dirAlmacenamiento.exists()==false ){
-            dirAlmacenamiento.mkdirs();
-        }
-        File image = File.createTempFile(fileName, ".jpg", dirAlmacenamiento);
-        urlCompletaImg = image.getAbsolutePath();
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        urlCompleteImg = image.getAbsolutePath();
         return image;
+    }
+    private void mostrarMsgToast(String msg){
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+    }
+    private void obtenerToken(){
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if( !task.isSuccessful() ){
+                return;
+            }
+            miToken = task.getResult();
+        });
+    }
+    void mostrarListaUsuarios(){
+        Intent intent = new Intent(getApplicationContext(), lista_usuarios.class);
+        startActivity(intent);
     }
 }

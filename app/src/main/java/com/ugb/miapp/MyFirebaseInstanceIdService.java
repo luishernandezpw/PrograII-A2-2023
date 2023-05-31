@@ -5,10 +5,10 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class MyFirebaseInstaceIdService extends FirebaseMessagingService {
+public class MyFirebaseInstanceIdService extends FirebaseMessagingService {
     public String obtenerToken(){
         AtomicReference<String> token = null;
-        FirebaseMessaging .getInstance().getToken().addOnCompleteListener(task -> {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if( !task.isSuccessful() ){
                 return;
             }
