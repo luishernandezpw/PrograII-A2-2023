@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,22 +18,30 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
 public class chats extends Activity {
     ImageView imgTemp;
@@ -163,7 +172,7 @@ public class chats extends Activity {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setRequestProperty("Content-Type", "application/json");
                 urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestProperty("Authorization", "key=BPecEuZ4bgReHa-k-qTiy37_6DD-J9rbP9RnQfWiUvLZU0MV9EtR8pzJU-S3i5PwSkRFJXYHmpIjU0HDi7MkV0M");
+                urlConnection.setRequestProperty("Authorization", "key=AAAAw8k5WGY:APA91bFusYbYLzNPq2ZS63Y8elBq-6EhnmoqcdmEzlbaFFORzM7IVWC3PRpFCNTdeOQ0o5nFjQgTeTdPaisrdtRgi_A4RKyn761Qz7veiF466hYm8-ofSm2iA89-KALXS9rJcjsLReBp");
 
                 //set headers and method
                 Writer writer = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "UTF-8"));
@@ -191,6 +200,7 @@ public class chats extends Activity {
 
             }catch (Exception ex){
                 ex.printStackTrace();
+                Log.d("URI: ", "Error enviando notificacion: "+ ex.getMessage());
             }
             return null;
         }
@@ -244,7 +254,7 @@ public class chats extends Activity {
     };
     void mostrarFoto(){
         imgTemp = findViewById(R.id.imgPhotoChat);
-        //Glide.with(getApplicationContext()).load(urlPhotoFirestore).into(imgTemp);
+        Glide.with(getApplicationContext()).load(urlPhotoFirestore).into(imgTemp);
     }
     private void mostrarMsgToast(String msg){
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
